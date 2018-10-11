@@ -1,0 +1,732 @@
+---
+title: "Tidy Modeling with R"
+author: "Chuliang Xiao"
+date: "October 12, 2018"
+output:
+  xaringan::moon_reader:
+    css: ["default", "my-theme.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      beforeInit: "https://platform.twitter.com/widgets.js"
+---
+
+```{r setup, include=FALSE}
+options(width = 100)
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+```
+
+
+# About Me
+
+- I'm Chuliang Xiao
+
+- Research Fellow @ U-M, Ann Arbor
+    * _Data Analytics_   
+    * _Predictive Modeling_   
+    * _Database Developing_  
+    
+- GitHub: [@ChuliangXiao](https://github.com/ChuliangXiao)
+
+- E-mail: <ChuliangX@gmail.com>
+
+---
+
+# Acknowledgments
+
+- Clayton Yochum, [@ClaytonJY](https://github.com/ClaytonJY)
+
+- Max Kuhn, [@topepo](https://github.com/topepo)
+
+
+---
+
+# The _R Language_
+
+- Use (know) _R_ ??
+
+--
+
+- Use _R_ on a regular base?
+
+--
+
+- Use `tidyverse` (like `ggplot2`, `dplyr`, `%>%`) ?
+
+--
+
+- Use `tidymodels` (like `recipes`, `rsample`) ?
+---
+
+# Tidyverse
+
+.pull-left[
+
+<br><br><br><br>
+
+![](images/r4ds-loop.png)  
+<br><br><br>
+
+Credit: Hadley Wickham & Garrett Grolemund
+] 
+
+
+.pull-right[
+![](images/tidyverse.png)  
+
+Credit: Loek Brinkman & Nick Michalak
+]
+
+---
+
+background-image: url(images/BaseTidyverse.png)
+background-size: contain
+class: center
+
+---
+
+# What about modeling _in the tidyverse_?
+
+--
+
+- Packages: {`stats`}, {`MASS`}, {`glmnet`}, {`rpart`}, {`randomForest`}, {`gbm`}, {`xgboost`} ...
+
+--
+
+- Tidyverse: {`broom`}, {`purrr`}, {`modelr`}, {`fable`} 
+
+--
+
+- Wrapper: {`caret`}, {`mlr`}
+
+--
+
+- ...
+
+---
+
+# {`caret`}
+
+
+
+.pull-left[
+
+- Wraps hundreds (237) of individual modeling packages 
+
+- Provides a unified interface
+
+- de facto ML package in _R_, as _`sci-kit learn`_ in Python
+
+] 
+
+
+.pull-right[
+
+- data splitting
+
+- pre-processing 
+
+- feature selection  
+
+- model tuning using resampling  
+
+- variable importance estimation
+
+<br><br><br><br><br>
+     Credit: Max Kuhn, [The `caret` Package](http://topepo.github.io/caret/index.html)
+
+]
+
+---
+
+# {caret}: Interface
+
+.pull-left[
+
+```r
+formula = outcome ~ predictors
+# NB
+fit1  <- klaR::NaiveBayes(formula, 
+                          data = train_df)
+# DT
+fit2  <- rpart::rpart(formula, 
+                      data = train_df)
+# RF
+fit3  <- randomForest::randomForest(formula, 
+                                    data = train_df)
+# XGBoost
+fit4  <- xgboost::xgboost(data = sparse_df, 
+                          label = outcome)
+#fit4  <- xgboost::xgboost(data = train_DMatrix)
+```
+
+] 
+
+
+.pull-right[
+
+```r
+library(caret)
+# NB from {klaR}
+fitNB <- train(formula, method = "nb", 
+               data = train_df)
+# DT from {rpart}
+fitDT <- train(formula, method = "rpart",
+               data = train_df)
+# RF from {randomForest}
+fitRF <- train(formula, method = "rf",   
+               data = train_df)
+# XB from {xgboost}
+fitXB <- train(formula, method = "xgbTree", 
+               data = train_df)
+```
+
+]
+
+
+---
+
+# {caret}: Parameters
+
+
+```{r}
+caret::modelLookup(model = "rf")
+
+caret::modelLookup(model = "gbm")
+                   
+caret::modelLookup(model = "xgbTree")
+```
+
+---
+
+# {caret}: Parameters Tuning
+
+.pull-left[
+
+Manually setting the parameters in XGBoost 
+```r
+param <- list(objective = "multi:softprob",
+              eval_metric = "mlogloss",
+              eta = 0.05,
+              max_depth = 8,
+              min_child_weight = 4,
+              colsample_bytree = 0.8,
+              gamma = 0.01,
+              subsample = 0.9)
+              
+mdcv <- xgb.cv(data = dtrain, 
+               params = param, 
+               nthread = 6, 
+               nfold = 10, 
+               nrounds = 200,
+               verbose = T)
+               
+# find the best (minimum) mlogloss
+# min_logloss = min(mdcv[, test.mlogloss.mean])
+# min_logloss_index = 
+#    which.min(mdcv[, test.mlogloss.mean])
+# nround = 80 for example
+fit <- xgb.train(data = dtrain, 
+                 params = best_param, 
+                 nrounds = nround, 
+                 nthread = 6)
+```
+]
+
+.pull-right[
+
+Parameter tuning in XGBoost with _`caret`_  
+```r
+# Credit: https://github.com/datasciencedojo/
+# meetup/tree/master/intro_to_ml_with_r_and_caret
+train.control <- trainControl(method = "repeatedcv",
+                              number = 10,
+                              repeats = 3,
+                              search = "grid")
+
+# grid search of hyperparameters for xgboost. 
+# See the following presentation for more information:
+# https://www.slideshare.net/
+#  odsc/owen-zhangopen-sourcetoolsanddscompetitions1
+tune.grid <- expand.grid(
+  eta = c(0.05, 0.075, 0.1),
+  nrounds = c(50, 75, 100),
+  max_depth = 6:8,
+  min_child_weight = c(2.0, 2.25, 2.5),
+  colsample_bytree = c(0.3, 0.4, 0.5),
+  gamma = 0,
+  subsample = 1)
+
+caret.cv <- train(Survived ~ ., 
+                  data = titanic.train,
+                  method = "xgbTree",
+                  tuneGrid = tune.grid,
+                  trControl = train.control)
+
+```
+]
+
+---
+
+# Limitation: Forumula Method (~)  
+
+.pull-left[
+## Pros  
+ 
+```r
+log(y) ~ x1 + x2
+```
+* Simple but elegant  
+
+* Embedding functions in line  
+
+* Very expressive  
+<br><br><br><br><br>
+For more, [The R Formula Method: The Good Parts](https://rviews.rstudio.com/2017/02/01/the-r-formula-method-the-good-parts/)
+]
+
+.pull-right[
+## Cons  
+
+```r
+y ~ scale(center(knn_impute(x1))) + f2(x2) + ..
+```
+* Hard-coded 
+
+* Inconvenient for large features
+
+* Multivariate outcomes  
+<br><br><br><br><br>
+Fore more, [The R Formula Method: The Bad Parts](https://rviews.rstudio.com/2017/03/01/the-r-formula-method-the-bad-parts/)
+]
+
+---
+
+# Limitation: {caret}
+
+.pull-left[
+
+{**caret**}, highly untidy predictive modeling:  
+
+* 14-year old 
+
+* More traditional R coding style.  
+
+* High-level "_I'll do that for you_" syntax.  
+
+* More comprehensive (for now) and less modular.  
+
+
+<br><br><br><br><br><br><br>
+(Max Kuhn, [Recipes for Data Processing @ useR! 2018](https://github.com/topepo/user2018/tree/master/slides))
+]
+
+.pull-right[
+```r
+# From randomForest
+rf_1 <- randomForest(x, y, mtry = 12, 
+                     ntree = 2000, 
+                     importance = TRUE)
+
+# From ranger
+rf_2 <- ranger(y ~ .,
+               data = dat,
+               mtry = 12,
+               num.trees = 2000,
+               importance = 'impurity')
+
+# From sparklyr
+rf_3 <- ml_random_forest(dat, 
+  intercept = FALSE, 
+  response = "y", 
+  features = names(dat)[names(dat) != "y"], 
+  col.sample.rate = 12,
+  num.trees = 2000)
+```
+
+Credit: [`parsnip` Package](https://topepo.github.io/parsnip/index.html)
+]
+
+---
+background-image: url(images/caret-package-in-R.png)
+background-size: contain
+background-position: bottom center
+class: left
+
+# {caret}: to say goodbye
+
+<blockquote class="twitter-tweet" data-conversation="none" data-lang="en"><p lang="en" dir="ltr">caret isn’t going away but most active development is going into the new packages. I’ll keep bugs fixed and add new models.</p>&mdash; Max Kuhn (@topepos) <a href="https://twitter.com/topepos/status/1026939727910461440?ref_src=twsrc%5Etfw">August 7, 2018</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+---
+
+# {tidymodels}: Tidy Modeling
+
+The tidy modeling {**tidymodels**} contains a set of coordinated packages that: 
+
+* Promote tenets of the [tidyverse](http://www.tidyverse.org/) (manifesto [here](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)): 
+   1. Reuse existing data structures.
+   1. Compose simple functions with the pipe.
+   1. Embrace functional programming.
+   1. Design for humans.
+
+* Encourage empirical validation and good methodology
+
+* Smooth out diverse interfaces
+
+* Enable a wider variety of methodologies (esp. for feature engineering)
+
+<br><br><br><br> 
+Credit: Max Kuhn, [Modeling in the Tidyverse @ rstudio::conf 2018 ](https://github.com/rstudio/rstudio-conf/tree/master/2018/Modeling_in_the_Tidyverse--Max_Kuhn)
+
+---
+background-image: url(images/Tidymodels_Hex.png)
+background-size: contain
+background-position: right center
+class: left
+
+# {tidymodels}: Packages
+
+A "meta-package" for modeling and statistical analysis 
+
+* {`tidyverse`}: data(database) import/prep/exploration/cleaning  
+
+* [`rsample`](https://tidymodels.github.io/rsample/):(re)sampling (e.g. K-Fold CV)  
+
+* [`recipes`](https://tidymodels.github.io/recipes/) pre-processing (scale, center, impute, etc.)  
+
+* [`parsnip`](https://github.com/topepo/parsnip): model fitting (replacing [`caret`](https://github.com/topepo/caret))  
+
+* [`yardstick`](https://tidymodels.github.io/yardstick/): model evaluation & selection    
+
+---
+
+# {tidymodels}: formula vs recipes
+
+.pull-left[
+
+```r
+library(caret)
+library(AmesHousing)
+ames <- make_ames()
+
+set.seed(1234)
+# {caret} data splitting
+ind     <- createDataPartition(ames$Sale_Price, 
+                             p = .75, 
+                             list = FALSE)
+Train   <- ames[ind, ]
+Test    <- ames[-ind, ]
+
+formula <- log(Sale_Price) ~ Alley + Lot_Area
+
+# lm
+mod1    <- lm(formula, data = Train)
+
+# Or using caret interface
+mod2    <- train(formula,
+                   data = Train,
+                   method = "lm")           
+
+```
+
+]
+
+.pull-right[
+```r
+library(tidymodels)
+set.seed(1234)
+# {rsample}
+data_split <- initial_split(ames, prop = 0.75) 
+ames_train <- training(data_split) # 75%
+ames_test  <- testing(data_split)  # 25%
+## Create an initial recipe with the same
+## operations as the previous formula
+rec <- recipe(Sale_Price ~ Alley + Lot_Area, 
+              data = ames_train %>% head()) %>% 
+  step_log(Sale_Price) %>%
+  step_dummy(Alley) 
+
+rec_trained <- prep(rec, 
+                    training = ames_train, 
+                    retain = TRUE)
+# Get the processed training set:
+design_mat <- juice(rec_trained)
+## Apply to any other  data set:
+rec_test <- bake(rec_trained, newdata = ames_test)  
+
+lm_mod <- train(formula(rec_trained), 
+                data = ames_train, 
+                method = "lm")
+```
+
+]
+---
+
+# {recipes}: Workflow  
+
+```r
+        recipe()  -->      prep()    -->  bake() and juice()
+
+       { define } -->  { estimate }  -->      { apply }
+```
+
+* Available Steps in `define`
+
+    - **Basic**: logs, roots, polynomials, logits, hyperbolics, ReLu
+    - **Encodings**: dummy variable, et al.
+    - **Date Features**: encodings for day/doy/month etc, holiday indicators
+    - **Filters**: correlation, near-zero variables, linear dependencies
+    - **Imputation**: bagged trees, nearest neighbor, mean/mode, limit-of-detection imputation, rolling window imputation
+    - **Normalization/Transformations**: center, scale, range, Box-Cox, Yeo-Johnson
+    - **Dimension Reduction**: PCA, kernel PCA, PLS, ICA, NNMF;, Isomap, data depth features, class distances
+    - **Others**: spline basis functions, interactions, spatial sign
+    - **Row operations**: class imbalance subsampling, `naomit`, lags
+
+ 
+More in process (i.e. autoencoders, more imputation methods, feature hashing, etc.)
+One of the [package vignettes](https://tidymodels.github.io/recipes/reference/step_interact.html) shows how to write your own step functions. 
+
+
+Credit: Max Kuhn, [Recipes for Data Processing @ 2018 useR!](https://github.com/topepo/user2018)
+---
+
+# {tidymodels}: A Complex Recipe 
+```r
+ames_rec <- recipe(Sale_Price ~ Bldg_Type + Neighborhood + Year_Built + 
+                   Gr_Liv_Area + Full_Bath + Year_Sold + Lot_Area +
+                   Central_Air + Longitude + Latitude,
+                   data = ames_train) %>%
+  step_log(Sale_Price, base = 10) %>%
+  
+  # mitigate extreme skewness in some predictors
+  step_YeoJohnson(Lot_Area, Gr_Liv_Area) %>%
+  
+  # some Neighborhoods are rare, pool them into "other"
+  step_other(Neighborhood, threshold = 0.05)  %>%
+  step_dummy(all_nominal()) %>%
+  step_interact(~ starts_with("Central_Air"):Year_Built) %>%
+  
+  # geocode values have highly nonlinear relationships with price
+  step_bs(Longitude, Latitude, options = list(df = 5))
+```
+* Allowable functions in steps for feature selection  
+
+     - **By name**: tidyselect::starts_with(), tidyselect::ends_with(), tidyselect::contains(), tidyselect::matches(), tidyselect::num_range(), and tidyselect::everything()  
+
+    - **By role**: has_role(), all_predictors(), and all_outcomes()  
+
+    - **By type**: has_type(), all_numeric(), and all_nominal()  
+    
+<br><br><br><br>    
+Credit: Max Kuhn, [Recipes for Data Processing @ 2018 useR!](https://github.com/topepo/user2018)
+---
+class: center middle
+
+# Demo
+
+---
+# _Titanic_ Dataset
+
+```{r message=F, warning=F}
+library(tidyverse)
+library(tidymodels)
+raw_tbl     <- read_csv("data/train.csv") %>% glimpse()
+
+set.seed(1234)
+data_split  <- initial_split(raw_tbl, strata = "Survived", prop = 0.75) 
+data_split
+train_tbl   <- training(data_split) 
+test_tbl    <- testing(data_split)
+```
+
+---
+
+# Close look at _Titanic_  
+
+```{r}
+#Hmisc::describe(raw_tbl) 
+summary(raw_tbl)
+```
+
+---
+
+# {recipes}: Generate a Formula
+.pull-left[
+```{r warning=F}
+response <- "Survived"
+features <- c("Parch", "SibSp", "Fare", "Sex", "Age")
+
+rec <- recipe(train_tbl) %>%
+  # Manually Add Roles
+  # New features can be added in the feature
+  add_role(response, new_role = "outcome") %>%
+  add_role(features, new_role = "predictor") %>%
+  
+  # Remove other features
+  step_rm(-has_role("outcome"), 
+          -has_role("predictor")) %>%
+  
+  # Convert `Survived` to factor
+  step_bin2factor(all_outcomes()) %>%
+  
+  # Imputation for missing values
+  step_meanimpute(all_numeric())
+
+```
+]
+
+.pull-right[
+
+```{r}
+c(class = class(rec), type = typeof(rec))
+rec
+```
+
+]
+
+---
+
+# {recipe}: Prepare Training data
+
+.pull-left[
+```{r}
+prepped <- prep(rec, train_tbl, retain = TRUE)
+prepped
+```
+]
+
+.pull-right[
+```{r}
+rec %>%
+  # estimate from training data
+  prep(train_tbl, retain = TRUE) %>%  
+  juice()
+```
+]
+
+---
+# {parsnip}: Build the Model
+
+.pull-left[
+```{r warning=F}
+library(parsnip)
+library(ranger)
+
+model_spec <- rand_forest("classification")
+set.seed(0814)
+rf <- fit(
+  # Classification
+  model_spec,
+  
+  # Get formula from the recipe
+  formula = formula(prepped),
+  
+  # Get data from the recipe 
+  data    = juice(prepped),
+  
+  # Specify RF model driver
+  engine  = "ranger"
+)
+```
+]
+
+.pull-right[
+```{r}
+rf
+```
+]
+---
+
+# {yardstick}: Evaluate the Model
+.pull-left[
+```{r warning=F}
+library(yardstick)
+
+p_training <- tibble(
+  actual = juice(prepped)[[response]],
+  predicted = predict_class(rf, juice(prepped))
+  )
+#predictions %>% metrics(actual, predicted)
+
+metrics(p_training, actual, predicted)
+
+conf_mat(p_training, actual, predicted)
+```
+]
+
+.pull-right[       
+```{r}
+pre_test <- bake(prepped, test_tbl)
+#pre_test
+p_test <- tibble(
+  actual = pre_test[[response]],
+  predicted = predict_class(rf, pre_test)
+  )
+#predictions %>% metrics(actual, predicted)
+
+metrics(p_test, actual, predicted)
+
+conf_mat(p_test, actual, predicted)
+```
+]
+  
+---
+background-image: url(images/Had_R_Tidyverse.png)
+background-size: contain
+class: center
+
+---
+
+# Session Info
+
+```{r}
+devtools::session_info("tidymodels")
+```
+
+---
+class: center middle
+
+# Thank You
+
+---
+
+# {rsample}: Tuning
+
+.pull-left[
+```{r}
+library(rsample)
+rset <- vfold_cv(train_tbl, v = 10, 
+                 repeats = 1, strata = NULL)
+rset
+```
+]
+
+.pull-right[
+```{r}
+library(purrr)
+rset$recipes <- map(rset$splits, prepper, 
+                    recipe = rec, retain = TRUE)
+rset
+```
+]
+
+---
+
+# Stick to 
+
+* {`caret`}
+
+```r
+library(caret)
+fitRF   <- train(formula = formula(prepped), 
+                 method = "rf", 
+                 data = juice(prepped))
+```
+
+---
