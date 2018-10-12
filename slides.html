@@ -26,11 +26,11 @@ class: center, middle, inverse, title-slide
 
 - I'm Chuliang Xiao
 
-- Research Fellow @ U-M, Ann Arbor
-    * _Data Analytics_   
-    * _Predictive Modeling_   
-    * _Database Developing_  
-    
+- Research Fellow @  SEAS, U-M
+    * _Data Analytics_
+    * _Predictive Modeling_
+    * _Database Developing_
+
 - GitHub: [@ChuliangXiao](https://github.com/ChuliangXiao)
 
 - E-mail: &lt;ChuliangX@gmail.com&gt;
@@ -48,19 +48,19 @@ class: center, middle, inverse, title-slide
 
 # The _R Language_
 
-- Use (know) _R_ ??
+- Use (know) _R_
 
 --
 
-- Use _R_ on a regular base?
+- Use _R_ on a regular base
 
 --
 
-- Use tidyverse (`ggplot2`, `dplyr`, `%&gt;%`) ?
+- Use tidyverse (e.g. `readr`, `ggplot2`, `dplyr`, `%&gt;%`)
 
 --
 
-- Use `tidymodels` (like `recipes`, `rsample`) ?
+- Use `tidymodels` (e.g. `recipes`, `rsample`)
 ---
 
 # Tidyverse
@@ -69,15 +69,15 @@ class: center, middle, inverse, title-slide
 
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 
-![](images/r4ds-loop.png)  
+![](images/r4ds-loop.png)
 &lt;br&gt;&lt;br&gt;&lt;br&gt;
 
 Credit: Hadley Wickham &amp; Garrett Grolemund
-] 
+]
 
 
 .pull-right[
-![](images/tidyverse.png)  
+![](images/tidyverse.png)
 
 Credit: Loek Brinkman &amp; Nick Michalak
 ]
@@ -98,7 +98,7 @@ class: center
 
 --
 
-- Tidyverse: {`broom`}, {`purrr`}, {`modelr`}, {`fable`} 
+- Tidyverse: {`broom`}, {`purrr`}, {`modelr`}, {`fable`}
 
 --
 
@@ -116,24 +116,24 @@ class: center
 
 .pull-left[
 
-- Wraps hundreds (237) of individual modeling packages 
+- Wraps hundreds (237) of individual modeling packages
 
 - Provides a unified interface
 
 - de facto ML package in _R_, as _`sci-kit learn`_ in Python
 
-] 
+]
 
 
 .pull-right[
 
 - data splitting
 
-- pre-processing 
+- pre-processing
 
-- feature selection  
+- feature selection
 
-- model tuning using resampling  
+- model tuning using resampling
 
 - variable importance estimation
 
@@ -151,21 +151,21 @@ class: center
 ```r
 formula = outcome ~ predictors
 # NB
-fit1  &lt;- klaR::NaiveBayes(formula, 
+fit1  &lt;- klaR::NaiveBayes(formula,
                           data = train_df)
 # DT
-fit2  &lt;- rpart::rpart(formula, 
+fit2  &lt;- rpart::rpart(formula,
                       data = train_df)
 # RF
-fit3  &lt;- randomForest::randomForest(formula, 
+fit3  &lt;- randomForest::randomForest(formula,
                                     data = train_df)
 # XGBoost
-fit4  &lt;- xgboost::xgboost(data = sparse_df, 
+fit4  &lt;- xgboost::xgboost(data = sparse_df,
                           label = outcome)
 #fit4  &lt;- xgboost::xgboost(data = train_DMatrix)
 ```
 
-] 
+]
 
 
 .pull-right[
@@ -173,16 +173,16 @@ fit4  &lt;- xgboost::xgboost(data = sparse_df,
 ```r
 library(caret)
 # NB from {klaR}
-fitNB &lt;- train(formula, method = "nb", 
+fitNB &lt;- train(formula, method = "nb",
                data = train_df)
 # DT from {rpart}
 fitDT &lt;- train(formula, method = "rpart",
                data = train_df)
 # RF from {randomForest}
-fitRF &lt;- train(formula, method = "rf",   
+fitRF &lt;- train(formula, method = "rf",
                data = train_df)
 # XB from {xgboost}
-fitXB &lt;- train(formula, method = "xgbTree", 
+fitXB &lt;- train(formula, method = "xgbTree",
                data = train_df)
 ```
 
@@ -237,7 +237,7 @@ caret::modelLookup(model = "xgbTree")
 
 .pull-left[
 
-Manually setting the parameters in XGBoost 
+Manually setting the parameters in XGBoost
 ```r
 param &lt;- list(objective = "multi:softprob",
               eval_metric = "mlogloss",
@@ -247,29 +247,29 @@ param &lt;- list(objective = "multi:softprob",
               colsample_bytree = 0.8,
               gamma = 0.01,
               subsample = 0.9)
-              
-mdcv &lt;- xgb.cv(data = dtrain, 
-               params = param, 
-               nthread = 6, 
-               nfold = 10, 
+
+mdcv &lt;- xgb.cv(data = dtrain,
+               params = param,
+               nthread = 6,
+               nfold = 10,
                nrounds = 200,
                verbose = T)
-               
+
 # find the best (minimum) mlogloss
 # min_logloss = min(mdcv[, test.mlogloss.mean])
-# min_logloss_index = 
+# min_logloss_index =
 #    which.min(mdcv[, test.mlogloss.mean])
 # nround = 80 for example
-fit &lt;- xgb.train(data = dtrain, 
-                 params = best_param, 
-                 nrounds = nround, 
+fit &lt;- xgb.train(data = dtrain,
+                 params = best_param,
+                 nrounds = nround,
                  nthread = 6)
 ```
 ]
 
 .pull-right[
 
-Parameter tuning in XGBoost with _`caret`_  
+Parameter tuning in XGBoost with _`caret`_
 ```r
 # Credit: https://github.com/datasciencedojo/
 # meetup/tree/master/intro_to_ml_with_r_and_caret
@@ -278,7 +278,7 @@ train.control &lt;- trainControl(method = "repeatedcv",
                               repeats = 3,
                               search = "grid")
 
-# grid search of hyperparameters for xgboost. 
+# grid search of hyperparameters for xgboost.
 # See the following presentation for more information:
 # https://www.slideshare.net/
 #  odsc/owen-zhangopen-sourcetoolsanddscompetitions1
@@ -291,7 +291,7 @@ tune.grid &lt;- expand.grid(
   gamma = 0,
   subsample = 1)
 
-caret.cv &lt;- train(Survived ~ ., 
+caret.cv &lt;- train(Survived ~ .,
                   data = titanic.train,
                   method = "xgbTree",
                   tuneGrid = tune.grid,
@@ -302,34 +302,34 @@ caret.cv &lt;- train(Survived ~ .,
 
 ---
 
-# Limitation: Forumula Method (~)  
+# Limitation: Forumula Method (~)
 
 .pull-left[
-## Pros  
- 
+## Pros
+
 ```r
 log(y) ~ x1 + x2
 ```
-* Simple but elegant  
+* Simple but elegant
 
-* Embedding functions in line  
+* Embedding functions in line
 
-* Very expressive  
+* Very expressive
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 For more, [The R Formula Method: The Good Parts](https://rviews.rstudio.com/2017/02/01/the-r-formula-method-the-good-parts/)
 ]
 
 .pull-right[
-## Cons  
+## Cons
 
 ```r
 y ~ scale(center(knn_impute(x1))) + f2(x2) + ..
 ```
-* Hard-coded 
+* Hard-coded
 
 * Inconvenient for large features
 
-* Multivariate outcomes  
+* Multivariate outcomes
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 Fore more, [The R Formula Method: The Bad Parts](https://rviews.rstudio.com/2017/03/01/the-r-formula-method-the-bad-parts/)
 ]
@@ -340,15 +340,15 @@ Fore more, [The R Formula Method: The Bad Parts](https://rviews.rstudio.com/2017
 
 .pull-left[
 
-{**caret**}, highly untidy predictive modeling:  
+{**caret**}, highly untidy predictive modeling:
 
-* 14-year old 
+* 14-year old
 
-* More traditional R coding style.  
+* More traditional R coding style.
 
-* High-level "_I'll do that for you_" syntax.  
+* High-level "_I'll do that for you_" syntax.
 
-* More comprehensive (for now) and less modular.  
+* More comprehensive (for now) and less modular.
 
 
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
@@ -358,8 +358,8 @@ Fore more, [The R Formula Method: The Bad Parts](https://rviews.rstudio.com/2017
 .pull-right[
 ```r
 # From randomForest
-rf_1 &lt;- randomForest(x, y, mtry = 12, 
-                     ntree = 2000, 
+rf_1 &lt;- randomForest(x, y, mtry = 12,
+                     ntree = 2000,
                      importance = TRUE)
 
 # From ranger
@@ -370,10 +370,10 @@ rf_2 &lt;- ranger(y ~ .,
                importance = 'impurity')
 
 # From sparklyr
-rf_3 &lt;- ml_random_forest(dat, 
-  intercept = FALSE, 
-  response = "y", 
-  features = names(dat)[names(dat) != "y"], 
+rf_3 &lt;- ml_random_forest(dat,
+  intercept = FALSE,
+  response = "y",
+  features = names(dat)[names(dat) != "y"],
   col.sample.rate = 12,
   num.trees = 2000)
 ```
@@ -397,9 +397,9 @@ class: left
 
 # {tidymodels}: Tidy Modeling
 
-The tidy modeling {**tidymodels**} contains a set of coordinated packages that: 
+The tidy modeling {**tidymodels**} contains a set of coordinated packages that:
 
-* Promote tenets of the [tidyverse](http://www.tidyverse.org/) (manifesto [here](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)): 
+* Promote tenets of the [tidyverse](http://www.tidyverse.org/) (manifesto [here](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)):
    1. Reuse existing data structures.
    1. Compose simple functions with the pipe.
    1. Embrace functional programming.
@@ -411,7 +411,7 @@ The tidy modeling {**tidymodels**} contains a set of coordinated packages that:
 
 * Enable a wider variety of methodologies (esp. for feature engineering)
 
-&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt; 
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 Credit: Max Kuhn, [Modeling in the Tidyverse @ rstudio::conf 2018 ](https://github.com/rstudio/rstudio-conf/tree/master/2018/Modeling_in_the_Tidyverse--Max_Kuhn)
 
 ---
@@ -422,17 +422,17 @@ class: left
 
 # {tidymodels}: Packages
 
-A "meta-package" for modeling and statistical analysis 
+A "meta-package" for modeling and statistical analysis
 
-* {`tidyverse`}: data(database) import/prep/exploration/cleaning  
+* {`tidyverse`}: data(database) import/prep/exploration/cleaning
 
-* [`rsample`](https://tidymodels.github.io/rsample/):(re)sampling (e.g. K-Fold CV)  
+* [`rsample`](https://tidymodels.github.io/rsample/):(re)sampling (e.g. K-Fold CV)
 
-* [`recipes`](https://tidymodels.github.io/recipes/) pre-processing (scale, center, impute, etc.)  
+* [`recipes`](https://tidymodels.github.io/recipes/) pre-processing (scale, center, impute, etc.)
 
-* [`parsnip`](https://github.com/topepo/parsnip): model fitting (replacing [`caret`](https://github.com/topepo/caret))  
+* [`parsnip`](https://github.com/topepo/parsnip): model fitting (replacing [`caret`](https://github.com/topepo/caret))
 
-* [`yardstick`](https://tidymodels.github.io/yardstick/): model evaluation &amp; selection    
+* [`yardstick`](https://tidymodels.github.io/yardstick/): model evaluation &amp; selection
 
 ---
 
@@ -447,8 +447,8 @@ ames &lt;- make_ames()
 
 set.seed(1234)
 # {caret} data splitting
-ind     &lt;- createDataPartition(ames$Sale_Price, 
-                             p = .75, 
+ind     &lt;- createDataPartition(ames$Sale_Price,
+                             p = .75,
                              list = FALSE)
 Train   &lt;- ames[ind, ]
 Test    &lt;- ames[-ind, ]
@@ -461,7 +461,7 @@ mod1    &lt;- lm(formula, data = Train)
 # Or using caret interface
 mod2    &lt;- train(formula,
                    data = Train,
-                   method = "lm")           
+                   method = "lm")
 
 ```
 
@@ -472,33 +472,33 @@ mod2    &lt;- train(formula,
 library(tidymodels)
 set.seed(1234)
 # {rsample}
-data_split &lt;- initial_split(ames, prop = 0.75) 
+data_split &lt;- initial_split(ames, prop = 0.75)
 ames_train &lt;- training(data_split) # 75%
 ames_test  &lt;- testing(data_split)  # 25%
 ## Create an initial recipe with the same
 ## operations as the previous formula
-rec &lt;- recipe(Sale_Price ~ Alley + Lot_Area, 
-              data = ames_train %&gt;% head()) %&gt;% 
+rec &lt;- recipe(Sale_Price ~ Alley + Lot_Area,
+              data = ames_train %&gt;% head()) %&gt;%
   step_log(Sale_Price) %&gt;%
-  step_dummy(Alley) 
+  step_dummy(Alley)
 
-rec_trained &lt;- prep(rec, 
-                    training = ames_train, 
+rec_trained &lt;- prep(rec,
+                    training = ames_train,
                     retain = TRUE)
 # Get the processed training set:
 design_mat &lt;- juice(rec_trained)
 ## Apply to any other  data set:
-rec_test &lt;- bake(rec_trained, newdata = ames_test)  
+rec_test &lt;- bake(rec_trained, newdata = ames_test)
 
-lm_mod &lt;- train(formula(rec_trained), 
-                data = ames_train, 
+lm_mod &lt;- train(formula(rec_trained),
+                data = ames_train,
                 method = "lm")
 ```
 
 ]
 ---
 
-# {recipes}: Workflow  
+# {recipes}: Workflow
 
 ```r
         recipe()  --&gt;      prep()    --&gt;  bake() and juice()
@@ -518,42 +518,42 @@ lm_mod &lt;- train(formula(rec_trained),
     - **Others**: spline basis functions, interactions, spatial sign
     - **Row operations**: class imbalance subsampling, `naomit`, lags
 
- 
+
 More in process (i.e. autoencoders, more imputation methods, feature hashing, etc.)
-One of the [package vignettes](https://tidymodels.github.io/recipes/reference/step_interact.html) shows how to write your own step functions. 
+One of the [package vignettes](https://tidymodels.github.io/recipes/reference/step_interact.html) shows how to write your own step functions.
 
 
 Credit: Max Kuhn, [Recipes for Data Processing @ 2018 useR!](https://github.com/topepo/user2018)
 ---
 
-# {tidymodels}: A Complex Recipe 
+# {tidymodels}: A Complex Recipe
 ```r
-ames_rec &lt;- recipe(Sale_Price ~ Bldg_Type + Neighborhood + Year_Built + 
+ames_rec &lt;- recipe(Sale_Price ~ Bldg_Type + Neighborhood + Year_Built +
                    Gr_Liv_Area + Full_Bath + Year_Sold + Lot_Area +
                    Central_Air + Longitude + Latitude,
                    data = ames_train) %&gt;%
   step_log(Sale_Price, base = 10) %&gt;%
-  
+
   # mitigate extreme skewness in some predictors
   step_YeoJohnson(Lot_Area, Gr_Liv_Area) %&gt;%
-  
+
   # some Neighborhoods are rare, pool them into "other"
   step_other(Neighborhood, threshold = 0.05)  %&gt;%
   step_dummy(all_nominal()) %&gt;%
   step_interact(~ starts_with("Central_Air"):Year_Built) %&gt;%
-  
+
   # geocode values have highly nonlinear relationships with price
   step_bs(Longitude, Latitude, options = list(df = 5))
 ```
-* Allowable functions in steps for feature selection  
+* Allowable functions in steps for feature selection
 
-     - **By name**: tidyselect::starts_with(), tidyselect::ends_with(), tidyselect::contains(), tidyselect::matches(), tidyselect::num_range(), and tidyselect::everything()  
+     - **By name**: tidyselect::starts_with(), tidyselect::ends_with(), tidyselect::contains(), tidyselect::matches(), tidyselect::num_range(), and tidyselect::everything()
 
-    - **By role**: has_role(), all_predictors(), and all_outcomes()  
+    - **By role**: has_role(), all_predictors(), and all_outcomes()
 
-    - **By type**: has_type(), all_numeric(), and all_nominal()  
-    
-&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;    
+    - **By type**: has_type(), all_numeric(), and all_nominal()
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 Credit: Max Kuhn, [Recipes for Data Processing @ 2018 useR!](https://github.com/topepo/user2018)
 ---
 class: center middle
@@ -589,7 +589,7 @@ raw_tbl     &lt;- read_csv("data/train.csv") %&gt;% glimpse()
 
 ```r
 set.seed(1234)
-data_split  &lt;- initial_split(raw_tbl, strata = "Survived", prop = 0.75) 
+data_split  &lt;- initial_split(raw_tbl, strata = "Survived", prop = 0.75)
 data_split
 ```
 
@@ -598,45 +598,45 @@ data_split
 ```
 
 ```r
-train_tbl   &lt;- training(data_split) 
+train_tbl   &lt;- training(data_split)
 test_tbl    &lt;- testing(data_split)
 ```
 
 ---
 
-# Close look at _Titanic_  
+# Close look at _Titanic_
 
 
 ```r
-#Hmisc::describe(raw_tbl) 
+#Hmisc::describe(raw_tbl)
 summary(raw_tbl)
 ```
 
 ```
-##   PassengerId       Survived          Pclass          Name               Sex           
-##  Min.   :  1.0   Min.   :0.0000   Min.   :1.000   Length:891         Length:891        
-##  1st Qu.:223.5   1st Qu.:0.0000   1st Qu.:2.000   Class :character   Class :character  
-##  Median :446.0   Median :0.0000   Median :3.000   Mode  :character   Mode  :character  
-##  Mean   :446.0   Mean   :0.3838   Mean   :2.309                                        
-##  3rd Qu.:668.5   3rd Qu.:1.0000   3rd Qu.:3.000                                        
-##  Max.   :891.0   Max.   :1.0000   Max.   :3.000                                        
-##                                                                                        
-##       Age            SibSp           Parch           Ticket               Fare       
-##  Min.   : 0.42   Min.   :0.000   Min.   :0.0000   Length:891         Min.   :  0.00  
-##  1st Qu.:20.12   1st Qu.:0.000   1st Qu.:0.0000   Class :character   1st Qu.:  7.91  
-##  Median :28.00   Median :0.000   Median :0.0000   Mode  :character   Median : 14.45  
-##  Mean   :29.70   Mean   :0.523   Mean   :0.3816                      Mean   : 32.20  
-##  3rd Qu.:38.00   3rd Qu.:1.000   3rd Qu.:0.0000                      3rd Qu.: 31.00  
-##  Max.   :80.00   Max.   :8.000   Max.   :6.0000                      Max.   :512.33  
-##  NA's   :177                                                                         
-##     Cabin             Embarked        
-##  Length:891         Length:891        
-##  Class :character   Class :character  
-##  Mode  :character   Mode  :character  
-##                                       
-##                                       
-##                                       
-## 
+##   PassengerId       Survived          Pclass          Name               Sex
+##  Min.   :  1.0   Min.   :0.0000   Min.   :1.000   Length:891         Length:891
+##  1st Qu.:223.5   1st Qu.:0.0000   1st Qu.:2.000   Class :character   Class :character
+##  Median :446.0   Median :0.0000   Median :3.000   Mode  :character   Mode  :character
+##  Mean   :446.0   Mean   :0.3838   Mean   :2.309
+##  3rd Qu.:668.5   3rd Qu.:1.0000   3rd Qu.:3.000
+##  Max.   :891.0   Max.   :1.0000   Max.   :3.000
+##
+##       Age            SibSp           Parch           Ticket               Fare
+##  Min.   : 0.42   Min.   :0.000   Min.   :0.0000   Length:891         Min.   :  0.00
+##  1st Qu.:20.12   1st Qu.:0.000   1st Qu.:0.0000   Class :character   1st Qu.:  7.91
+##  Median :28.00   Median :0.000   Median :0.0000   Mode  :character   Median : 14.45
+##  Mean   :29.70   Mean   :0.523   Mean   :0.3816                      Mean   : 32.20
+##  3rd Qu.:38.00   3rd Qu.:1.000   3rd Qu.:0.0000                      3rd Qu.: 31.00
+##  Max.   :80.00   Max.   :8.000   Max.   :6.0000                      Max.   :512.33
+##  NA's   :177
+##     Cabin             Embarked
+##  Length:891         Length:891
+##  Class :character   Class :character
+##  Mode  :character   Mode  :character
+##
+##
+##
+##
 ```
 
 ---
@@ -653,14 +653,14 @@ rec &lt;- recipe(train_tbl) %&gt;%
   # New features can be added in the feature
   add_role(response, new_role = "outcome") %&gt;%
   add_role(features, new_role = "predictor") %&gt;%
-  
+
   # Remove other features
-  step_rm(-has_role("outcome"), 
+  step_rm(-has_role("outcome"),
           -has_role("predictor")) %&gt;%
-  
+
   # Convert `Survived` to factor
   step_bin2factor(all_outcomes()) %&gt;%
-  
+
   # Imputation for missing values
   step_meanimpute(all_numeric())
 ```
@@ -674,7 +674,7 @@ c(class = class(rec), type = typeof(rec))
 ```
 
 ```
-##    class     type 
+##    class     type
 ## "recipe"   "list"
 ```
 
@@ -684,17 +684,17 @@ rec
 
 ```
 ## Data Recipe
-## 
+##
 ## Inputs:
-## 
+##
 ##       role #variables
 ##    outcome          1
 ##  predictor          5
-## 
+##
 ##   6 variables without declared roles
-## 
+##
 ## Operations:
-## 
+##
 ## Delete terms -has_role("outcome"), -has_role("predictor")
 ## Dummy variable to factor conversion for all_outcomes()
 ## Mean Imputation for all_numeric()
@@ -715,19 +715,19 @@ prepped
 
 ```
 ## Data Recipe
-## 
+##
 ## Inputs:
-## 
+##
 ##       role #variables
 ##    outcome          1
 ##  predictor          5
-## 
+##
 ##   6 variables without declared roles
-## 
-## Training data contained 669 data points and 537 incomplete rows. 
-## 
+##
+## Training data contained 669 data points and 537 incomplete rows.
+##
 ## Operations:
-## 
+##
 ## Variables removed PassengerId, Pclass, Name, Ticket, Cabin, Embarked [trained]
 ## Dummy variable to factor conversion for Survived [trained]
 ## Mean Imputation for Age, SibSp, Parch, Fare [trained]
@@ -739,7 +739,7 @@ prepped
 ```r
 rec %&gt;%
   # estimate from training data
-  prep(train_tbl, retain = TRUE) %&gt;%  
+  prep(train_tbl, retain = TRUE) %&gt;%
   juice()
 ```
 
@@ -748,15 +748,15 @@ rec %&gt;%
 ##    Survived Sex      Age SibSp Parch  Fare
 ##    &lt;fct&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
 ##  1 no       male    22       1     0  7.25
-##  2 yes      female  38       1     0 71.3 
+##  2 yes      female  38       1     0 71.3
 ##  3 yes      female  26       0     0  7.92
-##  4 yes      female  35       1     0 53.1 
+##  4 yes      female  35       1     0 53.1
 ##  5 no       male    35       0     0  8.05
 ##  6 no       male    29.5     0     0  8.46
-##  7 no       male    54       0     0 51.9 
-##  8 no       male     2       3     1 21.1 
-##  9 yes      female  27       0     2 11.1 
-## 10 yes      female  14       1     0 30.1 
+##  7 no       male    54       0     0 51.9
+##  8 no       male     2       3     1 21.1
+##  9 yes      female  27       0     2 11.1
+## 10 yes      female  14       1     0 30.1
 ## # ... with 659 more rows
 ```
 ]
@@ -775,13 +775,13 @@ set.seed(0814)
 rf &lt;- fit(
   # Classification
   model_spec,
-  
+
   # Get formula from the recipe
   formula = formula(prepped),
-  
-  # Get data from the recipe 
+
+  # Get data from the recipe
   data    = juice(prepped),
-  
+
   # Specify RF model driver
   engine  = "ranger"
 )
@@ -796,20 +796,20 @@ rf
 
 ```
 ## parsnip model object
-## 
+##
 ## Ranger result
-## 
+##
 ## Call:
-##  ranger::ranger(formula = formula, data = data, num.threads = 1,      verbose = FALSE, seed = sample.int(10^5, 1)) 
-## 
-## Type:                             Classification 
-## Number of trees:                  500 
-## Sample size:                      669 
-## Number of independent variables:  5 
-## Mtry:                             2 
-## Target node size:                 1 
-## Variable importance mode:         none 
-## Splitrule:                        gini 
+##  ranger::ranger(formula = formula, data = data, num.threads = 1,      verbose = FALSE, seed = sample.int(10^5, 1))
+##
+## Type:                             Classification
+## Number of trees:                  500
+## Sample size:                      669
+## Number of independent variables:  5
+## Mtry:                             2
+## Target node size:                 1
+## Variable importance mode:         none
+## Splitrule:                        gini
 ## OOB prediction error:             19.28 %
 ```
 ]
@@ -849,7 +849,7 @@ conf_mat(p_training, actual, predicted)
 ```
 ]
 
-.pull-right[       
+.pull-right[
 
 ```r
 pre_test &lt;- bake(prepped, test_tbl)
@@ -881,7 +881,7 @@ conf_mat(p_test, actual, predicted)
 ##        no   19 124
 ```
 ]
-  
+
 ---
 background-image: url(images/Had_R_Tidyverse.png)
 background-size: contain
@@ -897,162 +897,162 @@ devtools::session_info("tidymodels")
 ```
 
 ```
-##  setting  value                       
+##  setting  value
 ##  version  R version 3.5.0 (2018-04-23)
-##  system   x86_64, mingw32             
-##  ui       RTerm                       
-##  language (EN)                        
-##  collate  English_United States.1252  
-##  tz       America/New_York            
-##  date     2018-09-17                  
-## 
-##  package       * version    date       source                            
-##  abind           1.4-5      2016-07-21 CRAN (R 3.5.0)                    
-##  assertthat      0.2.0      2017-04-11 CRAN (R 3.5.0)                    
-##  backports       1.1.2      2017-12-13 CRAN (R 3.5.0)                    
-##  base64enc       0.1-3      2015-07-28 CRAN (R 3.5.0)                    
-##  bayesplot       1.6.0      2018-08-02 CRAN (R 3.5.1)                    
-##  BH              1.66.0-1   2018-02-13 CRAN (R 3.5.0)                    
-##  bindr           0.1.1      2018-03-13 CRAN (R 3.5.0)                    
-##  bindrcpp        0.2.2      2018-03-29 CRAN (R 3.5.0)                    
-##  bitops          1.0-6      2013-08-17 CRAN (R 3.5.0)                    
-##  broom         * 0.5.0      2018-07-17 CRAN (R 3.5.0)                    
-##  caTools         1.17.1.1   2018-07-20 CRAN (R 3.5.1)                    
-##  class           7.3-14     2015-08-30 CRAN (R 3.5.0)                    
-##  cli             1.0.0      2017-11-05 CRAN (R 3.5.0)                    
-##  colorspace      1.3-2      2016-12-14 CRAN (R 3.5.0)                    
-##  colourpicker    1.0        2017-09-27 CRAN (R 3.5.0)                    
-##  compiler        3.5.0      2018-04-23 local                             
-##  crayon          1.3.4      2017-09-16 CRAN (R 3.5.0)                    
-##  crosstalk       1.0.0      2016-12-21 CRAN (R 3.5.0)                    
-##  CVST            0.2-2      2018-05-26 CRAN (R 3.5.0)                    
-##  ddalpha         1.3.4      2018-06-23 CRAN (R 3.5.1)                    
-##  DEoptimR        1.0-8      2016-11-19 CRAN (R 3.5.0)                    
-##  digest          0.6.16     2018-08-22 CRAN (R 3.5.1)                    
-##  dimRed          0.1.0      2017-05-04 CRAN (R 3.5.0)                    
-##  dplyr         * 0.7.6      2018-06-29 CRAN (R 3.5.1)                    
-##  DRR             0.0.3      2018-01-06 CRAN (R 3.5.0)                    
-##  DT              0.4        2018-01-30 CRAN (R 3.5.0)                    
-##  dygraphs        1.1.1.6    2018-07-11 CRAN (R 3.5.1)                    
-##  fansi           0.3.0      2018-08-13 CRAN (R 3.5.1)                    
-##  gdata           2.18.0     2017-06-06 CRAN (R 3.5.0)                    
-##  geometry        0.3-6      2015-09-09 CRAN (R 3.5.0)                    
-##  ggplot2       * 3.0.0      2018-07-03 CRAN (R 3.5.1)                    
-##  ggridges        0.5.0      2018-04-05 CRAN (R 3.5.0)                    
-##  glue            1.3.0      2018-07-17 CRAN (R 3.5.1)                    
-##  gower           0.1.2      2017-02-23 CRAN (R 3.5.0)                    
-##  gplots          3.0.1      2016-03-30 CRAN (R 3.5.1)                    
-##  graphics      * 3.5.0      2018-04-23 local                             
-##  grDevices     * 3.5.0      2018-04-23 local                             
-##  grid            3.5.0      2018-04-23 local                             
-##  gridExtra       2.3        2017-09-09 CRAN (R 3.5.0)                    
-##  gtable          0.2.0      2016-02-26 CRAN (R 3.5.0)                    
-##  gtools          3.8.1      2018-06-26 CRAN (R 3.5.0)                    
-##  htmltools       0.3.6      2017-04-28 CRAN (R 3.5.0)                    
-##  htmlwidgets     1.2        2018-04-19 CRAN (R 3.5.0)                    
-##  httpuv          1.4.5      2018-07-19 CRAN (R 3.5.1)                    
-##  hunspell        2.9        2017-12-16 CRAN (R 3.5.0)                    
-##  igraph          1.2.2      2018-07-27 CRAN (R 3.5.1)                    
-##  infer         * 0.3.1      2018-08-06 CRAN (R 3.5.1)                    
-##  inline          0.3.15     2018-05-18 CRAN (R 3.5.0)                    
-##  ipred           0.9-7      2018-08-14 CRAN (R 3.5.1)                    
-##  ISOcodes        2018.06.29 2018-06-30 CRAN (R 3.5.1)                    
-##  janeaustenr     0.1.5      2017-06-10 CRAN (R 3.5.0)                    
-##  jsonlite        1.5        2017-06-01 CRAN (R 3.5.0)                    
-##  kernlab         0.9-27     2018-08-10 CRAN (R 3.5.1)                    
-##  KernSmooth      2.23-15    2015-06-29 CRAN (R 3.5.0)                    
-##  labeling        0.3        2014-08-23 CRAN (R 3.5.0)                    
-##  later           0.7.4      2018-08-31 CRAN (R 3.5.1)                    
-##  lattice         0.20-35    2017-03-25 CRAN (R 3.5.0)                    
-##  lava            1.6.3      2018-08-10 CRAN (R 3.5.1)                    
-##  lazyeval        0.2.1      2017-10-29 CRAN (R 3.5.0)                    
-##  lme4            1.1-18-1   2018-08-17 CRAN (R 3.5.1)                    
-##  loo             2.0.0      2018-04-11 CRAN (R 3.5.0)                    
-##  lubridate       1.7.4      2018-04-11 CRAN (R 3.5.0)                    
-##  magic           1.5-8      2018-01-26 CRAN (R 3.5.0)                    
-##  magrittr        1.5        2014-11-22 CRAN (R 3.5.0)                    
-##  markdown        0.8        2017-04-20 CRAN (R 3.5.0)                    
-##  MASS            7.3-50     2018-04-30 CRAN (R 3.5.0)                    
-##  Matrix          1.2-14     2018-04-13 CRAN (R 3.5.0)                    
-##  matrixStats     0.54.0     2018-07-23 CRAN (R 3.5.1)                    
-##  methods       * 3.5.0      2018-04-23 local                             
-##  mgcv            1.8-24     2018-06-23 CRAN (R 3.5.1)                    
-##  mime            0.5        2016-07-07 CRAN (R 3.5.0)                    
-##  miniUI          0.1.1.1    2018-05-18 CRAN (R 3.5.0)                    
-##  minqa           1.2.4      2014-10-09 CRAN (R 3.5.1)                    
-##  MLmetrics       1.1.1      2016-05-13 CRAN (R 3.5.1)                    
-##  munsell         0.5.0      2018-06-12 CRAN (R 3.5.1)                    
-##  nlme            3.1-137    2018-04-07 CRAN (R 3.5.0)                    
-##  nloptr          1.0.4      2017-08-22 CRAN (R 3.5.1)                    
-##  nnet            7.3-12     2016-02-02 CRAN (R 3.5.0)                    
-##  numDeriv        2016.8-1   2016-08-27 CRAN (R 3.5.0)                    
-##  packrat         0.4.9-3    2018-06-01 CRAN (R 3.5.0)                    
-##  parallel        3.5.0      2018-04-23 local                             
-##  pillar          1.3.0      2018-07-14 CRAN (R 3.5.1)                    
-##  pkgconfig       2.0.2      2018-08-16 CRAN (R 3.5.1)                    
-##  PKI             0.1-5.1    2017-09-16 CRAN (R 3.5.0)                    
-##  plogr           0.2.0      2018-03-25 CRAN (R 3.5.0)                    
-##  pls             2.7-0      2018-08-21 CRAN (R 3.5.1)                    
-##  plyr            1.8.4      2016-06-08 CRAN (R 3.5.0)                    
-##  pROC            1.12.1     2018-05-06 CRAN (R 3.5.1)                    
-##  prodlim         2018.04.18 2018-04-18 CRAN (R 3.5.0)                    
-##  promises        1.0.1      2018-04-13 CRAN (R 3.5.0)                    
-##  purrr         * 0.2.5      2018-05-29 CRAN (R 3.5.0)                    
-##  R6              2.2.2      2017-06-17 CRAN (R 3.5.0)                    
-##  RColorBrewer    1.1-2      2014-12-07 CRAN (R 3.5.0)                    
-##  Rcpp            0.12.18    2018-07-23 CRAN (R 3.5.1)                    
-##  RcppEigen       0.3.3.4.0  2018-02-07 CRAN (R 3.5.0)                    
-##  RcppRoll        0.3.0      2018-06-05 CRAN (R 3.5.0)                    
-##  RCurl           1.95-4.11  2018-07-15 CRAN (R 3.5.1)                    
-##  recipes       * 0.1.3      2018-06-16 CRAN (R 3.5.0)                    
-##  reshape2        1.4.3      2017-12-11 CRAN (R 3.5.0)                    
-##  RJSONIO         1.3-0      2014-07-28 CRAN (R 3.5.0)                    
-##  rlang           0.2.2      2018-08-16 CRAN (R 3.5.1)                    
-##  robustbase      0.93-2     2018-07-27 CRAN (R 3.5.1)                    
-##  ROCR            1.0-7      2015-03-26 CRAN (R 3.5.1)                    
-##  rpart           4.1-13     2018-02-23 CRAN (R 3.5.0)                    
-##  rsample       * 0.0.2      2017-11-12 CRAN (R 3.5.0)                    
-##  rsconnect       0.8.8      2018-03-09 CRAN (R 3.5.0)                    
-##  rstan           2.17.3     2018-01-20 CRAN (R 3.5.0)                    
-##  rstanarm        2.17.4     2018-04-13 CRAN (R 3.5.1)                    
-##  rstantools      1.5.1      2018-08-22 CRAN (R 3.5.1)                    
-##  rstudioapi      0.7        2017-09-07 CRAN (R 3.5.0)                    
-##  scales          1.0.0      2018-08-09 CRAN (R 3.5.0)                    
-##  sfsmisc         1.1-2      2018-03-05 CRAN (R 3.5.0)                    
-##  shiny           1.1.0      2018-05-17 CRAN (R 3.5.0)                    
-##  shinyjs         1.0        2018-01-08 CRAN (R 3.5.0)                    
-##  shinystan       2.5.0      2018-05-01 CRAN (R 3.5.0)                    
-##  shinythemes     1.1.1      2016-10-12 CRAN (R 3.5.0)                    
-##  SnowballC       0.5.1      2014-08-09 CRAN (R 3.5.0)                    
-##  sourcetools     0.1.7      2018-04-25 CRAN (R 3.5.0)                    
-##  splines         3.5.0      2018-04-23 local                             
-##  SQUAREM         2017.10-1  2017-10-07 CRAN (R 3.5.0)                    
-##  StanHeaders     2.17.2     2018-01-20 CRAN (R 3.5.0)                    
-##  stats         * 3.5.0      2018-04-23 local                             
-##  stats4          3.5.0      2018-04-23 local                             
-##  stopwords       0.9.0      2017-12-14 CRAN (R 3.5.0)                    
-##  stringi         1.2.4      2018-07-20 CRAN (R 3.5.0)                    
-##  stringr       * 1.3.1      2018-05-10 CRAN (R 3.5.0)                    
-##  survival        2.42-6     2018-07-13 CRAN (R 3.5.1)                    
-##  threejs         0.3.1      2017-08-13 CRAN (R 3.5.0)                    
-##  tibble        * 1.4.2      2018-01-22 CRAN (R 3.5.0)                    
+##  system   x86_64, mingw32
+##  ui       RTerm
+##  language (EN)
+##  collate  English_United States.1252
+##  tz       America/New_York
+##  date     2018-09-17
+##
+##  package       * version    date       source
+##  abind           1.4-5      2016-07-21 CRAN (R 3.5.0)
+##  assertthat      0.2.0      2017-04-11 CRAN (R 3.5.0)
+##  backports       1.1.2      2017-12-13 CRAN (R 3.5.0)
+##  base64enc       0.1-3      2015-07-28 CRAN (R 3.5.0)
+##  bayesplot       1.6.0      2018-08-02 CRAN (R 3.5.1)
+##  BH              1.66.0-1   2018-02-13 CRAN (R 3.5.0)
+##  bindr           0.1.1      2018-03-13 CRAN (R 3.5.0)
+##  bindrcpp        0.2.2      2018-03-29 CRAN (R 3.5.0)
+##  bitops          1.0-6      2013-08-17 CRAN (R 3.5.0)
+##  broom         * 0.5.0      2018-07-17 CRAN (R 3.5.0)
+##  caTools         1.17.1.1   2018-07-20 CRAN (R 3.5.1)
+##  class           7.3-14     2015-08-30 CRAN (R 3.5.0)
+##  cli             1.0.0      2017-11-05 CRAN (R 3.5.0)
+##  colorspace      1.3-2      2016-12-14 CRAN (R 3.5.0)
+##  colourpicker    1.0        2017-09-27 CRAN (R 3.5.0)
+##  compiler        3.5.0      2018-04-23 local
+##  crayon          1.3.4      2017-09-16 CRAN (R 3.5.0)
+##  crosstalk       1.0.0      2016-12-21 CRAN (R 3.5.0)
+##  CVST            0.2-2      2018-05-26 CRAN (R 3.5.0)
+##  ddalpha         1.3.4      2018-06-23 CRAN (R 3.5.1)
+##  DEoptimR        1.0-8      2016-11-19 CRAN (R 3.5.0)
+##  digest          0.6.16     2018-08-22 CRAN (R 3.5.1)
+##  dimRed          0.1.0      2017-05-04 CRAN (R 3.5.0)
+##  dplyr         * 0.7.6      2018-06-29 CRAN (R 3.5.1)
+##  DRR             0.0.3      2018-01-06 CRAN (R 3.5.0)
+##  DT              0.4        2018-01-30 CRAN (R 3.5.0)
+##  dygraphs        1.1.1.6    2018-07-11 CRAN (R 3.5.1)
+##  fansi           0.3.0      2018-08-13 CRAN (R 3.5.1)
+##  gdata           2.18.0     2017-06-06 CRAN (R 3.5.0)
+##  geometry        0.3-6      2015-09-09 CRAN (R 3.5.0)
+##  ggplot2       * 3.0.0      2018-07-03 CRAN (R 3.5.1)
+##  ggridges        0.5.0      2018-04-05 CRAN (R 3.5.0)
+##  glue            1.3.0      2018-07-17 CRAN (R 3.5.1)
+##  gower           0.1.2      2017-02-23 CRAN (R 3.5.0)
+##  gplots          3.0.1      2016-03-30 CRAN (R 3.5.1)
+##  graphics      * 3.5.0      2018-04-23 local
+##  grDevices     * 3.5.0      2018-04-23 local
+##  grid            3.5.0      2018-04-23 local
+##  gridExtra       2.3        2017-09-09 CRAN (R 3.5.0)
+##  gtable          0.2.0      2016-02-26 CRAN (R 3.5.0)
+##  gtools          3.8.1      2018-06-26 CRAN (R 3.5.0)
+##  htmltools       0.3.6      2017-04-28 CRAN (R 3.5.0)
+##  htmlwidgets     1.2        2018-04-19 CRAN (R 3.5.0)
+##  httpuv          1.4.5      2018-07-19 CRAN (R 3.5.1)
+##  hunspell        2.9        2017-12-16 CRAN (R 3.5.0)
+##  igraph          1.2.2      2018-07-27 CRAN (R 3.5.1)
+##  infer         * 0.3.1      2018-08-06 CRAN (R 3.5.1)
+##  inline          0.3.15     2018-05-18 CRAN (R 3.5.0)
+##  ipred           0.9-7      2018-08-14 CRAN (R 3.5.1)
+##  ISOcodes        2018.06.29 2018-06-30 CRAN (R 3.5.1)
+##  janeaustenr     0.1.5      2017-06-10 CRAN (R 3.5.0)
+##  jsonlite        1.5        2017-06-01 CRAN (R 3.5.0)
+##  kernlab         0.9-27     2018-08-10 CRAN (R 3.5.1)
+##  KernSmooth      2.23-15    2015-06-29 CRAN (R 3.5.0)
+##  labeling        0.3        2014-08-23 CRAN (R 3.5.0)
+##  later           0.7.4      2018-08-31 CRAN (R 3.5.1)
+##  lattice         0.20-35    2017-03-25 CRAN (R 3.5.0)
+##  lava            1.6.3      2018-08-10 CRAN (R 3.5.1)
+##  lazyeval        0.2.1      2017-10-29 CRAN (R 3.5.0)
+##  lme4            1.1-18-1   2018-08-17 CRAN (R 3.5.1)
+##  loo             2.0.0      2018-04-11 CRAN (R 3.5.0)
+##  lubridate       1.7.4      2018-04-11 CRAN (R 3.5.0)
+##  magic           1.5-8      2018-01-26 CRAN (R 3.5.0)
+##  magrittr        1.5        2014-11-22 CRAN (R 3.5.0)
+##  markdown        0.8        2017-04-20 CRAN (R 3.5.0)
+##  MASS            7.3-50     2018-04-30 CRAN (R 3.5.0)
+##  Matrix          1.2-14     2018-04-13 CRAN (R 3.5.0)
+##  matrixStats     0.54.0     2018-07-23 CRAN (R 3.5.1)
+##  methods       * 3.5.0      2018-04-23 local
+##  mgcv            1.8-24     2018-06-23 CRAN (R 3.5.1)
+##  mime            0.5        2016-07-07 CRAN (R 3.5.0)
+##  miniUI          0.1.1.1    2018-05-18 CRAN (R 3.5.0)
+##  minqa           1.2.4      2014-10-09 CRAN (R 3.5.1)
+##  MLmetrics       1.1.1      2016-05-13 CRAN (R 3.5.1)
+##  munsell         0.5.0      2018-06-12 CRAN (R 3.5.1)
+##  nlme            3.1-137    2018-04-07 CRAN (R 3.5.0)
+##  nloptr          1.0.4      2017-08-22 CRAN (R 3.5.1)
+##  nnet            7.3-12     2016-02-02 CRAN (R 3.5.0)
+##  numDeriv        2016.8-1   2016-08-27 CRAN (R 3.5.0)
+##  packrat         0.4.9-3    2018-06-01 CRAN (R 3.5.0)
+##  parallel        3.5.0      2018-04-23 local
+##  pillar          1.3.0      2018-07-14 CRAN (R 3.5.1)
+##  pkgconfig       2.0.2      2018-08-16 CRAN (R 3.5.1)
+##  PKI             0.1-5.1    2017-09-16 CRAN (R 3.5.0)
+##  plogr           0.2.0      2018-03-25 CRAN (R 3.5.0)
+##  pls             2.7-0      2018-08-21 CRAN (R 3.5.1)
+##  plyr            1.8.4      2016-06-08 CRAN (R 3.5.0)
+##  pROC            1.12.1     2018-05-06 CRAN (R 3.5.1)
+##  prodlim         2018.04.18 2018-04-18 CRAN (R 3.5.0)
+##  promises        1.0.1      2018-04-13 CRAN (R 3.5.0)
+##  purrr         * 0.2.5      2018-05-29 CRAN (R 3.5.0)
+##  R6              2.2.2      2017-06-17 CRAN (R 3.5.0)
+##  RColorBrewer    1.1-2      2014-12-07 CRAN (R 3.5.0)
+##  Rcpp            0.12.18    2018-07-23 CRAN (R 3.5.1)
+##  RcppEigen       0.3.3.4.0  2018-02-07 CRAN (R 3.5.0)
+##  RcppRoll        0.3.0      2018-06-05 CRAN (R 3.5.0)
+##  RCurl           1.95-4.11  2018-07-15 CRAN (R 3.5.1)
+##  recipes       * 0.1.3      2018-06-16 CRAN (R 3.5.0)
+##  reshape2        1.4.3      2017-12-11 CRAN (R 3.5.0)
+##  RJSONIO         1.3-0      2014-07-28 CRAN (R 3.5.0)
+##  rlang           0.2.2      2018-08-16 CRAN (R 3.5.1)
+##  robustbase      0.93-2     2018-07-27 CRAN (R 3.5.1)
+##  ROCR            1.0-7      2015-03-26 CRAN (R 3.5.1)
+##  rpart           4.1-13     2018-02-23 CRAN (R 3.5.0)
+##  rsample       * 0.0.2      2017-11-12 CRAN (R 3.5.0)
+##  rsconnect       0.8.8      2018-03-09 CRAN (R 3.5.0)
+##  rstan           2.17.3     2018-01-20 CRAN (R 3.5.0)
+##  rstanarm        2.17.4     2018-04-13 CRAN (R 3.5.1)
+##  rstantools      1.5.1      2018-08-22 CRAN (R 3.5.1)
+##  rstudioapi      0.7        2017-09-07 CRAN (R 3.5.0)
+##  scales          1.0.0      2018-08-09 CRAN (R 3.5.0)
+##  sfsmisc         1.1-2      2018-03-05 CRAN (R 3.5.0)
+##  shiny           1.1.0      2018-05-17 CRAN (R 3.5.0)
+##  shinyjs         1.0        2018-01-08 CRAN (R 3.5.0)
+##  shinystan       2.5.0      2018-05-01 CRAN (R 3.5.0)
+##  shinythemes     1.1.1      2016-10-12 CRAN (R 3.5.0)
+##  SnowballC       0.5.1      2014-08-09 CRAN (R 3.5.0)
+##  sourcetools     0.1.7      2018-04-25 CRAN (R 3.5.0)
+##  splines         3.5.0      2018-04-23 local
+##  SQUAREM         2017.10-1  2017-10-07 CRAN (R 3.5.0)
+##  StanHeaders     2.17.2     2018-01-20 CRAN (R 3.5.0)
+##  stats         * 3.5.0      2018-04-23 local
+##  stats4          3.5.0      2018-04-23 local
+##  stopwords       0.9.0      2017-12-14 CRAN (R 3.5.0)
+##  stringi         1.2.4      2018-07-20 CRAN (R 3.5.0)
+##  stringr       * 1.3.1      2018-05-10 CRAN (R 3.5.0)
+##  survival        2.42-6     2018-07-13 CRAN (R 3.5.1)
+##  threejs         0.3.1      2017-08-13 CRAN (R 3.5.0)
+##  tibble        * 1.4.2      2018-01-22 CRAN (R 3.5.0)
 ##  tidymodels    * 0.0.1      2018-08-02 Github (topepo/tidymodels@20539e7)
-##  tidyposterior   0.0.1      2017-11-14 CRAN (R 3.5.1)                    
-##  tidypredict     0.2.0      2018-02-25 CRAN (R 3.5.1)                    
-##  tidyr         * 0.8.1      2018-05-18 CRAN (R 3.5.0)                    
-##  tidyselect      0.2.4      2018-02-26 CRAN (R 3.5.0)                    
-##  tidytext        0.1.9      2018-05-29 CRAN (R 3.5.0)                    
-##  timeDate        3043.102   2018-02-21 CRAN (R 3.5.0)                    
-##  tokenizers      0.2.1      2018-03-29 CRAN (R 3.5.0)                    
-##  tools           3.5.0      2018-04-23 local                             
-##  utf8            1.1.4      2018-05-24 CRAN (R 3.5.0)                    
-##  utils         * 3.5.0      2018-04-23 local                             
-##  viridisLite     0.3.0      2018-02-01 CRAN (R 3.5.0)                    
-##  withr           2.1.2      2018-03-15 CRAN (R 3.5.0)                    
-##  xtable          1.8-3      2018-08-29 CRAN (R 3.5.1)                    
-##  xts             0.11-1     2018-09-12 CRAN (R 3.5.0)                    
-##  yaml            2.2.0      2018-07-25 CRAN (R 3.5.1)                    
-##  yardstick     * 0.0.1      2017-11-12 CRAN (R 3.5.1)                    
+##  tidyposterior   0.0.1      2017-11-14 CRAN (R 3.5.1)
+##  tidypredict     0.2.0      2018-02-25 CRAN (R 3.5.1)
+##  tidyr         * 0.8.1      2018-05-18 CRAN (R 3.5.0)
+##  tidyselect      0.2.4      2018-02-26 CRAN (R 3.5.0)
+##  tidytext        0.1.9      2018-05-29 CRAN (R 3.5.0)
+##  timeDate        3043.102   2018-02-21 CRAN (R 3.5.0)
+##  tokenizers      0.2.1      2018-03-29 CRAN (R 3.5.0)
+##  tools           3.5.0      2018-04-23 local
+##  utf8            1.1.4      2018-05-24 CRAN (R 3.5.0)
+##  utils         * 3.5.0      2018-04-23 local
+##  viridisLite     0.3.0      2018-02-01 CRAN (R 3.5.0)
+##  withr           2.1.2      2018-03-15 CRAN (R 3.5.0)
+##  xtable          1.8-3      2018-08-29 CRAN (R 3.5.1)
+##  xts             0.11-1     2018-09-12 CRAN (R 3.5.0)
+##  yaml            2.2.0      2018-07-25 CRAN (R 3.5.1)
+##  yardstick     * 0.0.1      2017-11-12 CRAN (R 3.5.1)
 ##  zoo             1.8-3      2018-07-16 CRAN (R 3.5.1)
 ```
 
@@ -1069,16 +1069,16 @@ class: center middle
 
 ```r
 library(rsample)
-rset &lt;- vfold_cv(train_tbl, v = 10, 
+rset &lt;- vfold_cv(train_tbl, v = 10,
                  repeats = 1, strata = NULL)
 rset
 ```
 
 ```
-## #  10-fold cross-validation 
+## #  10-fold cross-validation
 ## # A tibble: 10 x 2
-##    splits       id    
-##    &lt;list&gt;       &lt;chr&gt; 
+##    splits       id
+##    &lt;list&gt;       &lt;chr&gt;
 ##  1 &lt;S3: rsplit&gt; Fold01
 ##  2 &lt;S3: rsplit&gt; Fold02
 ##  3 &lt;S3: rsplit&gt; Fold03
@@ -1096,16 +1096,16 @@ rset
 
 ```r
 library(purrr)
-rset$recipes &lt;- map(rset$splits, prepper, 
+rset$recipes &lt;- map(rset$splits, prepper,
                     recipe = rec, retain = TRUE)
 rset
 ```
 
 ```
-## #  10-fold cross-validation 
+## #  10-fold cross-validation
 ## # A tibble: 10 x 3
-##    splits       id     recipes     
-##    &lt;list&gt;       &lt;chr&gt;  &lt;list&gt;      
+##    splits       id     recipes
+##    &lt;list&gt;       &lt;chr&gt;  &lt;list&gt;
 ##  1 &lt;S3: rsplit&gt; Fold01 &lt;S3: recipe&gt;
 ##  2 &lt;S3: rsplit&gt; Fold02 &lt;S3: recipe&gt;
 ##  3 &lt;S3: rsplit&gt; Fold03 &lt;S3: recipe&gt;
@@ -1121,14 +1121,14 @@ rset
 
 ---
 
-# Stick to 
+# Stick to
 
 * {`caret`}
 
 ```r
 library(caret)
-fitRF   &lt;- train(formula = formula(prepped), 
-                 method = "rf", 
+fitRF   &lt;- train(formula = formula(prepped),
+                 method = "rf",
                  data = juice(prepped))
 ```
 

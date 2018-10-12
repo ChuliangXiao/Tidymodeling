@@ -25,7 +25,7 @@ knitr::opts_chunk$set(message = FALSE)
 
 - I'm Chuliang Xiao
 
-- Research Fellow @ U-M, Ann Arbor
+- Research Fellow @ SEAS, U-M
     * _Data Analytics_   
     * _Predictive Modeling_   
     * _Database Developing_  
@@ -47,19 +47,19 @@ knitr::opts_chunk$set(message = FALSE)
 
 # The _R Language_
 
-- Use (know) _R_ ??
+- Use (know) _R_ 
 
 --
 
-- Use _R_ on a regular base?
+- Use _R_ on a regular base
 
 --
 
-- Use `tidyverse` (like `ggplot2`, `dplyr`, `%>%`) ?
+- Use `tidyverse` (e.g. `readr`, `ggplot2`, `dplyr`, `%>%`) 
 
 --
 
-- Use `tidymodels` (like `recipes`, `rsample`) ?
+- Use `tidymodels` (e.g. `recipes`, `rsample`) 
 ---
 
 # Tidyverse
