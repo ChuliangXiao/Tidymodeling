@@ -32,7 +32,7 @@ knitr::opts_chunk$set(message = FALSE)
     
 - GitHub: [@ChuliangXiao](https://github.com/ChuliangXiao)
 
-- E-mail: <ChuliangX@gmail.com>
+- E-mail: <cxiao@umich.edu>
 
 ---
 
